@@ -1,6 +1,8 @@
 ﻿using BookingTourWeb_WebAPI.Models.InputModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
 
 namespace BookingTourWeb_WebAPI.Controllers
 {
@@ -9,6 +11,7 @@ namespace BookingTourWeb_WebAPI.Controllers
     public class AuthController : Controller
     {
         private readonly DvmayBayContext _context;
+        private int _otp;
 
         public AuthController(DvmayBayContext context)
         {

@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Mail;
-
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 namespace BookingTourWeb_WebAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
@@ -11,11 +15,13 @@ namespace BookingTourWeb_WebAPI.Controllers
     public class AuthController : Controller
     {
         private readonly DvmayBayContext _context;
+        private readonly IConfiguration _config;
         private int _otp;
 
-        public AuthController(DvmayBayContext context)
+        public AuthController(DvmayBayContext context, IConfiguration config)
         {
             this._context = context;
+            this._config = config;
         }
 
         [HttpPost]
@@ -62,10 +68,31 @@ namespace BookingTourWeb_WebAPI.Controllers
                 var checkMK = checkTK.MatKhau == request.MatKhau;
                 if (checkMK == true)
                 {
-                    return Ok(true);
+                    var token = GenerateToken(checkTK);
+                    return Ok(token);
                 }
             }
-            return NotFound(false);
+            return Ok(false);
+        }
+
+        private string GenerateToken(Taikhoan user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier,user.TaiKhoan1),
+                new Claim(ClaimTypes.Role ,user.VaiTro == 1 ? "admin" : "khachHang")
+            };
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+                _config["Jwt:Audience"],
+                claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials);
+
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
 
         [HttpPost]

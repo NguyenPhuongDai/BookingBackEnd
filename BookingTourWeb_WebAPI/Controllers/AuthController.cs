@@ -68,7 +68,7 @@ namespace BookingTourWeb_WebAPI.Controllers
                 var checkMK = checkTK.MatKhau == request.MatKhau;
                 if (checkMK == true)
                 {
-                    var token = GenerateToken(checkTK);
+                    var token = checkTK.MaTaiKhoan.ToString() + ' ' + GenerateToken(checkTK)+ ' ' + checkTK.VaiTro.ToString();
                     return Ok(token);
                 }
             }
@@ -82,7 +82,7 @@ namespace BookingTourWeb_WebAPI.Controllers
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier,user.TaiKhoan1),
-                new Claim(ClaimTypes.Role ,user.VaiTro == 1 ? "admin" : "khachHang")
+                new Claim(ClaimTypes.Role ,user.VaiTro == 0 ? "admin" : "khachHang")
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],

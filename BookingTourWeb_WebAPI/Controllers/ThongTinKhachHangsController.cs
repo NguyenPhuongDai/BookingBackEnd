@@ -94,7 +94,7 @@ namespace TourBookingWeb_API.Controllers
         }
         */
         [HttpGet("{makhachhang}")]
-        public async Task<ActionResult<IEnumerable<ThongTinKhachHang>>> GetThongTinKhachHangByMakhachhang(long makhachhang)
+        public async Task<ActionResult<Object>> GetThongTinKhachHangByMakhachhang(long makhachhang)
         {
             var ThongTinKhachHang = await (from khachhang in _context.Khachhangs
 
@@ -108,14 +108,23 @@ namespace TourBookingWeb_API.Controllers
                                                Sdt = khachhang.Sdt,
                                                Phai = khachhang.Phai
                                            })
-            .ToListAsync();
+            .FirstOrDefaultAsync();
 
             if (ThongTinKhachHang == null)
             {
                 return NotFound("ThongTinKhachHang not found.");
             }
 
-            return ThongTinKhachHang;
+            var taiKhoan = _context.Taikhoans.Where(x => x.MaTaiKhoan == ThongTinKhachHang.MaTaiKhoan).FirstOrDefault();
+
+            dynamic result = new System.Dynamic.ExpandoObject();
+            result.Makhachhang = ThongTinKhachHang.Makhachhang;
+            result.HoTenKh = ThongTinKhachHang.HoTenKh;
+            result.GmailKh = ThongTinKhachHang.GmailKh;
+            result.Sdt = ThongTinKhachHang.Sdt;
+            result.Phai = ThongTinKhachHang.Phai;
+
+            return result;
         }
         //===========================================================================
 

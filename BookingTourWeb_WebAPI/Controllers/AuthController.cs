@@ -1,4 +1,4 @@
-﻿    using BookingTourWeb_WebAPI.Models.InputModels;
+﻿using BookingTourWeb_WebAPI.Models.InputModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -16,7 +16,6 @@ namespace BookingTourWeb_WebAPI.Controllers
     {
         private readonly DvmayBayContext _context;
         private readonly IConfiguration _config;
-        private int _otp;
 
         public AuthController(DvmayBayContext context, IConfiguration config)
         {
@@ -25,8 +24,10 @@ namespace BookingTourWeb_WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task SendOtpAsync(InputForgetPassword request)
+        public async Task<ActionResult> SendOtpAsync(InputForgetPassword request)
         {
+            var checkEmail = await _context.Khachhangs.Where(x => x.GmailKh == request.email).FirstOrDefaultAsync();
+            if (checkEmail == null) { return Ok(false); }
             var mail = "ximvhs26092002@gmail.com";
             var pass = "niuiehecquymxqdr";
             var message = new MailMessage();
@@ -35,7 +36,6 @@ namespace BookingTourWeb_WebAPI.Controllers
             message.Subject = "Reset password";
             message.Body = "<html><body> Your code is: " + request.message + "</body></html>";
             message.IsBodyHtml = true;
-            this._otp = Int32.Parse(request.message);
             var client = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
@@ -45,7 +45,7 @@ namespace BookingTourWeb_WebAPI.Controllers
             };
 
             client.Send(message);
-
+            return Ok(request.message);
         }
 
         [HttpPost]
@@ -56,6 +56,23 @@ namespace BookingTourWeb_WebAPI.Controllers
             tk.MatKhau = "123456";
             this._context.Update(tk);
             await this._context.SaveChangesAsync();
+            var mail = "ximvhs26092002@gmail.com";
+            var pass = "niuiehecquymxqdr";
+            var message = new MailMessage();
+            message.From = new MailAddress(mail);
+            message.To.Add(new MailAddress(request.email));
+            message.Subject = "Reset password";
+            message.Body = "<html><body> Mật khẩu mới của bạn là: " + "123456" + "</body></html>";
+            message.IsBodyHtml = true;
+            var client = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(mail, pass),
+                EnableSsl = true
+            };
+
+            client.Send(message);
             return Ok(true);
         }
 

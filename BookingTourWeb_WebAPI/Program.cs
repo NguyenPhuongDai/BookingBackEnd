@@ -28,6 +28,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+builder.Services.AddSwaggerGen(c =>
+{
+    c.ResolveConflictingActions(apidescriptions => apidescriptions.First());
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

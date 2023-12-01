@@ -28,7 +28,20 @@ namespace BookingTourWeb_WebAPI.Controllers
             var result = await _context.Chuyenbays.Where(x => x.NoiXuatPhat == input.fromPlace && x.NoiDen == input.toPlace && x.NgayXuatPhat >= DateTime.Parse(input.startDate)).ToListAsync();
             return Ok(result);
         }
+        [HttpGet]
+        public async Task<ActionResult<object>> GetByCodeAsync(string code)
+        {
+            var chuyenBay = await _context.Chuyenbays.Where(x => x.MaChuyenBay == code).Join(_context.Maybays, x => x.MaMayBay, mayBay => mayBay.MaMayBay, (x, mayBay) => new
+            {
+                chuyenBay = x,
+                mayBay = mayBay
+            }).FirstOrDefaultAsync();
+            if (chuyenBay != null)
+            {
+                return Ok(chuyenBay);
+            }
+            return NotFound();
+        }
 
-        
     }
 }

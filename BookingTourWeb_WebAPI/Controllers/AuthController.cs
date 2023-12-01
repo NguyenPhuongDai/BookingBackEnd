@@ -1,4 +1,4 @@
-﻿using BookingTourWeb_WebAPI.Models.InputModels;
+﻿    using BookingTourWeb_WebAPI.Models.InputModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -49,14 +49,14 @@ namespace BookingTourWeb_WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CheckOtpAsync(int input)
+        public async Task<ActionResult> ChangePasswordAsync(InputChangePassword request)
         {
-            if (this._otp == input)
-            {
-                return Ok(true);
-            }
-
-            return NotFound(false);
+            var kh = await this._context.Khachhangs.Where(x => x.GmailKh == request.email).FirstOrDefaultAsync();
+            var tk = await this._context.Taikhoans.Where(x => x.MaTaiKhoan == kh.MaTaiKhoan).FirstOrDefaultAsync();
+            tk.MatKhau = "123456";
+            this._context.Update(tk);
+            await this._context.SaveChangesAsync();
+            return Ok(true);
         }
 
         [HttpPost]

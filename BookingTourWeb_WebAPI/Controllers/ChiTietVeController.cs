@@ -65,7 +65,7 @@ namespace BookingTourWeb_WebAPI.Controllers
                 MaChuyenBay = x.MaChuyenBay,
                 LoaiVe = x.LoaiVe,
                 SoLuong = x.SoLuong,
-                TinhTrang=x.TinhTrang,
+                TinhTrang = x.TinhTrang,
                 TongGia = x.TongGia,
             }).Where(x => chuyenBays.Select(xx => xx.MaChuyenBay).Contains(x.MaChuyenBay) && x.LoaiVe == input.typeSeat).ToList();
 

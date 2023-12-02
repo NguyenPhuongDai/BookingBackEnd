@@ -98,7 +98,7 @@ namespace TourBookingWeb_API.Controllers
         {
             var ThongTinKhachHang = await (from khachhang in _context.Khachhangs
 
-                                           where khachhang.MaKh.Equals(makhachhang)
+                                           where khachhang.MaTaiKhoan.Equals(makhachhang)
                                            select new ThongTinKhachHang()
                                            {
                                                Makhachhang = khachhang.MaKh,

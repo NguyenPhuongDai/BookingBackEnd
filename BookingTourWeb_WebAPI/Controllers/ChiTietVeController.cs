@@ -95,5 +95,28 @@ namespace BookingTourWeb_WebAPI.Controllers
             await _context.SaveChangesAsync();
             return Ok(input);
         }
+
+        [HttpPost]
+        public async Task<ActionResult> CreateAsync(InputChiTietVe request)
+        {
+            var kh = await _context.Khachhangs.Where(x => x.GmailKh == request.GmailKh).FirstOrDefaultAsync();
+            var newVe = new Ve() { MaVe = request.MaVe, MaKh= kh.MaKh, MaKhNavigation= kh, NgayDatVe= DateTime.Parse(request.NgayDatVe)};
+            await _context.Ves.AddAsync(newVe);
+            _context.SaveChanges();
+            var newCTV = new Chitietve() { MaCTV = 0, MaVe = newVe.MaVe, LoaiVe = request.LoaiVe, MaChuyenBay=request.MaChuyenBay, SoLuong = request.SoLuong, TinhTrang= request.TinhTrang, TongGia=request.TongGia };
+            await _context.Chitietves.AddAsync(newCTV);
+            var chuyenBay = await _context.Chuyenbays.Where(x => x.MaChuyenBay == request.MaChuyenBay).FirstOrDefaultAsync();
+            if(request.LoaiVe == "BSN")
+            {
+                chuyenBay.SoLuongVeBsn = chuyenBay.SoLuongVeBsn - request.SoLuong;
+            }
+            else
+            {
+                chuyenBay.SoLuongVeEco = chuyenBay.SoLuongVeEco - request.SoLuong;
+            }
+            _context.Chuyenbays.Update(chuyenBay);
+            _context.SaveChanges();
+            return Ok(newCTV);
+        }
     }
 }
